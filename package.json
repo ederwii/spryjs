@@ -1,0 +1,26 @@
+{
+  "name": "spry-js",
+  "version": "1.0.0",
+  "description": "JavaScript-based framework that enables rapid development of Web API's",
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "files": [
+    "lib/"
+  ],
+  "scripts": {
+    "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "prepublish": "npm run tsc",
+    "dev": "nodemon --config nodemon.json src/index.ts",
+    "dev:debug": "nodemon --config nodemon.json --inspect-brk src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Alan Martinez",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^14.14.31",
+    "nodemon": "^2.0.7",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
+  }
+}
