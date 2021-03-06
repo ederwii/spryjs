@@ -1,6 +1,7 @@
 import express, {
   Application,
 } from "express";
+import mongoose from "mongoose";
 
 class App {
   private app: Application;
@@ -16,6 +17,14 @@ class App {
   private setConfig() {
   }
 
+  enabbleMongoose(cs: string) {
+    mongoose.set("useCreateIndex", true);
+
+    mongoose.connect(cs, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+  }
   
 }
 

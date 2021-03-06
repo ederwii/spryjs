@@ -6,24 +6,20 @@ class SpryJs {
   _server: any;
   _initialized = false;
 
-  constructor(port?: string | number) {
+  constructor(cs: string, port?: string | number, callback = () => { }) {
     this._port = port ? this.normalizePort(port) : this.defaultPort;
-    this.initialize();
+    this.initialize(cs, callback);
   }
 
-  private initialize() {
+  private initialize(cs: string, callback = () => { }) {
     application.getApp.set("port", this._port);
+    application.enabbleMongoose(cs);
 
     this._server = _http.createServer(application.getApp);
 
     this._server.listen(this._port);
     this._server.on("error", this.onError);
-    this._server.on("listening", this.onListening(this));
-  }
-
-  build(port: number | string) {
-    this._port = port ? this.normalizePort(port) : this.defaultPort;
-    this.initialize();
+    this._server.on("listening", this.onListening(this, callback));
   }
 
   get server() {
@@ -70,12 +66,13 @@ class SpryJs {
     }
   }
 
-  private onListening(scope: any) {
+  private onListening(scope: any, callback = () => { }) {
     return () => {
       var addr = scope._server.address();
       var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
       console.log("Listening on " + bind);
       scope._initialized = true;
+      callback();
     }
   }
 
