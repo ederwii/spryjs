@@ -1,14 +1,14 @@
-export default interface IService<T> {
-  Get(): Promise<T[]>;
-  GetById(id: string): Promise<T | null>;
-  Create(payload: Partial<T>): Promise<T>;
+export default interface IService {
+  Get(): Promise<any[]>;
+  GetById(id: string): Promise<any | null>;
+  Create(payload: Partial<any>): Promise<any>;
   Delete(id: string): Promise<boolean>;
-  Patch(operations: IPatchOperation[], id: string): Promise<T>;
-  GetByKeyword(keyword: any): Promise<T[]>;
-  GetByKeywordMatch(keyword: any): Promise<T[]>;
-  GetByQuery(params: any, fields: string, options: any): Promise<T[]>;
+  Patch(operations: IPatchOperation[], id: string): Promise<any>;
+  GetByKeyword(keyword: any): Promise<any[]>;
+  GetByKeywordMatch(keyword: any): Promise<any[]>;
+  GetByQuery(params: any, fields: string, options: any): Promise<any[]>;
   GetCount(): Promise<Number>;
-  Update(id: string, payload: Partial<T>): Promise<T>;
+  Update(id: string, payload: Partial<any>): Promise<any>;
 }
 
 export interface IPatchOperation {

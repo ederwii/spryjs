@@ -1,5 +1,5 @@
 import application from "./app";
-const _http = require("http");
+import _http from "http";
 
 class SpryJs {
   _port: number | string;
@@ -11,15 +11,21 @@ class SpryJs {
     this.initialize(cs, callback);
   }
 
+  enableMorgan() {
+    application.enableMorgan();
+  }
+
   private initialize(cs: string, callback = () => { }) {
     application.getApp.set("port", this._port);
-    application.enabbleMongoose(cs);
+    application.enabbleMongoose(cs).then(() => {
+      this._server = _http.createServer(application.getApp);
 
-    this._server = _http.createServer(application.getApp);
+      this._server.listen(this._port);
+      this._server.on("error", this.onError);
+      this._server.on("listening", this.onListening(this, callback));
+    })
 
-    this._server.listen(this._port);
-    this._server.on("error", this.onError);
-    this._server.on("listening", this.onListening(this, callback));
+
   }
 
   get server() {

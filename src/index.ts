@@ -3,7 +3,7 @@ import lservice from "./services/local.service";
 import FactoryController from "./controllers/factory.controller";
 import FactoryService from "./services/factory.service";
 import IService from "./services/service.interface";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 let app: any;
 
 export default class SpryJs {
@@ -19,21 +19,25 @@ export default class SpryJs {
     })
   }
 
+  enableMorgan() {
+    this.app.enableMorgan();
+  }
+
   get app() {
     return app as any as SpryJs;
   }
 
-  registerEntity<T>(name: string, model: mongoose.Model<any>, path?: string, keyword?: string, service?: IService<any>) {
+  registerEntity(name: string, model: Schema, path?: string, keyword?: string, service?: IService) {
     if (!path) {
       path = name;
     }
-
+    const mm = mongoose.model(name, model);
     if (!service) {
-      service = new FactoryService<T>(model, name, keyword)
+      service = new FactoryService(mm, name, keyword)
     }
     var fixedPath = `/api/${path}`;
-    console.log(app.app);
-    const controller = new FactoryController<T>(app.app, fixedPath, service);
+
+    const controller = new FactoryController(app.app, fixedPath, service);
     lservice.getInstance().addEntity({
       name, path, service, controller
     })
@@ -45,6 +49,10 @@ export default class SpryJs {
     lservice.getInstance().entities.forEach(e => {
       console.log(e);
     })
+  }
+
+  useMorgan() {
+    
   }
 }
 

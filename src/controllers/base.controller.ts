@@ -21,7 +21,7 @@ export default abstract class BaseController<T> {
   };
   constructor(
     private _app: Application,
-    private service: IService<T>,
+    private service: IService,
     private baseApi: string,
     config?: any
   ) {
@@ -31,12 +31,13 @@ export default abstract class BaseController<T> {
   }
 
   public registerRoutes() {
-    console.log(this._app);
+    console.log('Register path ' + this.baseApi);
     this._app
       .route(this.baseApi.toLowerCase())
       .get(
         this._config.auth.get ? DoPrivateRequest : DoRequest,
         async (req, res) => {
+          
           const sortBy = req.query.sortBy
             ? req.query.sortBy.toString().split(",")
             : [];
@@ -95,6 +96,7 @@ export default abstract class BaseController<T> {
             const total = await this.service.GetCount();
             res.status(200).send({ items, total });
           } catch (err) {
+            console.log(err)
             res.status(500).send(err);
           }
         }

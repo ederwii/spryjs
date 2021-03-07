@@ -1,9 +1,8 @@
 import BaseService from "./base.service";
 import mongoose from "mongoose";
-import IBaseEntity from "../data/base.entity";
 
-export default class FactoryService<T> extends BaseService<T> {
-  constructor(entity: mongoose.Model<IBaseEntity>,
+export default class FactoryService extends BaseService {
+  constructor(entity: mongoose.Model<any>,
     entityName: string,
     keywordField: string = "") {
     super(entity, entityName, keywordField)

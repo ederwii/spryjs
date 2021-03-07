@@ -2,12 +2,12 @@ import IService, { IPatchOperation } from "./service.interface";
 import IBaseEntity from "../data/base.entity";
 import mongoose from "mongoose";
 
-export default abstract class BaseService<T> implements IService<T> {
+export default abstract class BaseService implements IService {
   public _entity: any;
   public keywordField: string;
   public entityName: string;
   constructor(
-    __entity: mongoose.Model<IBaseEntity>,
+    __entity: mongoose.Model<any>,
     entityName: string,
     keywordField: string = ""
   ) {
@@ -16,25 +16,25 @@ export default abstract class BaseService<T> implements IService<T> {
     this.entityName = entityName;
   }
 
-  async Get(): Promise<T[]> {
+  async Get(): Promise<any[]> {
     return await this.GetByQuery({});
   }
 
-  async GetByKeywordMatch(keyword: any): Promise<T[]> {
+  async GetByKeywordMatch(keyword: any): Promise<any[]> {
     const params = {
       [this.keywordField]: keyword,
     };
     return this.GetByQuery(params);
   }
 
-  async GetByKeyword(keyword: any): Promise<T[]> {
+  async GetByKeyword(keyword: any): Promise<any[]> {
     const params = {
       [this.keywordField]: { $regex: "*." + keyword + ".*", $options: "i" },
     };
     return this.GetByQuery(params);
   }
 
-  async GetById(id: string, fields: string = ""): Promise<T | null> {
+  async GetById(id: string, fields: string = ""): Promise<any | null> {
     return await this._entity.findById(id, fields).exec();
   }
 
@@ -46,12 +46,12 @@ export default abstract class BaseService<T> implements IService<T> {
     params: any,
     fields: string = "",
     options: any = {}
-  ): Promise<T[]> {
+  ): Promise<any[]> {
     return await this._entity.find(params, fields, options).exec();
   }
 
-  async Create(payload: Partial<T>): Promise<T> {
-    return new Promise<T>(async (resolve, reject) => {
+  async Create(payload: Partial<any>): Promise<any> {
+    return new Promise<any>(async (resolve, reject) => {
       const data: any = { ...payload };
       if (!payload.hasOwnProperty("code")) {
         data.code = await this.GetCount();
@@ -70,7 +70,7 @@ export default abstract class BaseService<T> implements IService<T> {
   async Delete(id: string): Promise<boolean> {
     return await this._entity.deleteOne({ _id: id }).exec();
   }
-  async Patch(operations: IPatchOperation[], id: string): Promise<T> {
+  async Patch(operations: IPatchOperation[], id: string): Promise<any> {
     const updateOps: any = {};
     for (const op of operations) {
       if (op.area) {
@@ -90,7 +90,7 @@ export default abstract class BaseService<T> implements IService<T> {
       .exec();
   }
 
-  async Update(id: string, payload: Partial<T>) {
+  async Update(id: string, payload: Partial<any>) {
     const existing = await this._entity.findById(id).exec();
     let data: any = { ...payload };
     let diff: any = {};
