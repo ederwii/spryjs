@@ -24,7 +24,6 @@ class App {
 
   enabbleMongoose(cs: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      console.log('enable mongo ' + cs);
       mongoose.set("useCreateIndex", true);
 
       mongoose.connect(cs, {
