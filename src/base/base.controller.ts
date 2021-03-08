@@ -1,4 +1,4 @@
-import IService from "../services/service.interface";
+import IService from "./service.interface";
 import { Application } from "express";
 import { DoRequest, DoPrivateRequest } from "../utils";
 import jwt from "jsonwebtoken";

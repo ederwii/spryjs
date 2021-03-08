@@ -1,5 +1,5 @@
 {
-  "name": "spry-js",
+  "name": "@ederwii/spry-js",
   "version": "1.0.0",
   "description": "JavaScript-based framework that enables rapid development of Web API's",
   "main": "./lib/cjs/index.js",

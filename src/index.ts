@@ -2,7 +2,7 @@ import service from "./spryjs";
 import lservice from "./services/local.service";
 import FactoryController from "./controllers/factory.controller";
 import FactoryService from "./services/factory.service";
-import IService from "./services/service.interface";
+import IService from "./base/service.interface";
 import mongoose, { Schema } from "mongoose";
 let app: any;
 

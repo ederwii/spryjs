@@ -1,4 +1,4 @@
-import BaseService from "./base.service";
+import BaseService from "../base/base.service";
 import mongoose from "mongoose";
 
 export default class FactoryService extends BaseService {

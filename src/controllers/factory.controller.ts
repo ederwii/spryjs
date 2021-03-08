@@ -1,6 +1,6 @@
 import { Application } from "express";
-import BaseController from "./base.controller";
-import IService from "../services/service.interface";
+import BaseController from "../base/base.controller";
+import IService from "../base/service.interface";
 
 export default class FactoryController<T> extends BaseController<T> {
   constructor(app: Application, baseApi: string, service: IService, config?: any) {

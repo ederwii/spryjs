@@ -1,11 +1,11 @@
 import IService, { IPatchOperation } from "./service.interface";
-import IBaseEntity from "../data/base.entity";
 import mongoose from "mongoose";
 
 export default abstract class BaseService implements IService {
   public _entity: any;
   public keywordField: string;
   public entityName: string;
+  
   constructor(
     __entity: mongoose.Model<any>,
     entityName: string,
@@ -67,9 +67,11 @@ export default abstract class BaseService implements IService {
       }
     });
   }
+
   async Delete(id: string): Promise<boolean> {
     return await this._entity.deleteOne({ _id: id }).exec();
   }
+
   async Patch(operations: IPatchOperation[], id: string): Promise<any> {
     const updateOps: any = {};
     for (const op of operations) {
