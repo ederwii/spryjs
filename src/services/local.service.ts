@@ -2,6 +2,14 @@ export class service {
   private TOKEN_SECRET = '';
   private MONGO_CS = '';
   private ENTITIES: any[] = [];
+  private USE_TIMESTAMPS: boolean = true;
+
+  get useTimestamps() {
+    return this.USE_TIMESTAMPS;
+  }
+  set useTimestamps(val) {
+    this.USE_TIMESTAMPS = val;
+  }
 
   get entities() {
     return this.ENTITIES;

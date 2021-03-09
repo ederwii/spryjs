@@ -10,7 +10,7 @@ const service = localService.getInstance();
 const TOKEN_SECRET = service.tokenSecret;
 
 export default abstract class BaseController {
-  
+
   private readonly _config: SpryConfig = {
     auth: {
       get: false,
@@ -192,22 +192,14 @@ export default abstract class BaseController {
       .put(
         this._config.auth.put ? DoPrivateRequest : DoRequest,
         async (req, res) => {
-          if (!req.body._id) {
-            res.sendStatus(400);
-            return;
-          }
           const token = req.header("auth-token");
-          const verified: any = jwt.verify(
-            token ? token.toString() : "",
-            TOKEN_SECRET
-          );
-          req.body["userId"] = verified._id;
-          delete req.body._id;
-          delete req.body.createdAt;
-          delete req.body.updatedAt;
-          delete req.body.__v;
-          delete req.body.expanded;
-          delete req.body.editMode;
+          if (token && token.length > 50) {
+            const verified: any = jwt.verify(
+              token ? token.toString() : "",
+              TOKEN_SECRET
+            );
+            req.body["userId"] = verified._id;
+          }
           this.service
             .Update(req.params.id, req.body)
             .then(() => {

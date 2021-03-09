@@ -37,21 +37,32 @@ export default class SpryJs {
 
   /** Enable MongoDB initialization for data storage layer
    * @param {string} connectionString - MongoDB Connection string
+   * @param {boolean} useTimestamps - Enable timestamps on database entities
    * @returns {Promise<boolean>} Promise with status of connection initialization
    */
-  useMongo(connectionString: string): Promise<boolean> {
+  useMongo(connectionString: string, useTimestamps: boolean = false): Promise<boolean> {
+    lservice.getInstance().mongoCs = connectionString;
+    lservice.getInstance().useTimestamps = useTimestamps;
     return this.app.useMongo(connectionString);
   }
 
-  private get app() {
-    return app as any as _;
-  }
-
-  registerEntity(name: string, model: Schema, path?: string, keyword?: string, config?: SpryConfig, service?: IService) {
+  /**
+   * Register new entity in the application
+   * @param {string} name - Name of the entity. 
+   * @param {any} model - Model for the entity  
+   * @param {string} path - Path for the API endpoint. Defaults to the name of the entity 
+   * @param {string} keyword - Property name to be used with searchByKeyword method 
+   * @param {SpryConfig} config - Configuration object 
+   * @param {IService} service - Service class for API logic 
+   */
+  registerEntity(name: string, model: any, path?: string, keyword?: string, config?: SpryConfig, service?: IService) {
     if (!path) {
       path = name;
     }
-    const mm = mongoose.model(name, model);
+    const m = new Schema(model, {
+      timestamps: lservice.getInstance().useTimestamps
+    });
+    const mm = mongoose.model(name, m);
     if (!service) {
       service = new FactoryService(mm, name, keyword)
     }
@@ -64,11 +75,16 @@ export default class SpryJs {
     console.log(`Entity ${name} registered correctly. Full CRUD enabled on ${fixedPath}`);
   }
 
+  /** Print SpryJs configuration */
   info() {
     // Entities
     lservice.getInstance().entities.forEach(e => {
       console.log(e);
     })
+  }
+
+  private get app() {
+    return app as any as _;
   }
 }
 
