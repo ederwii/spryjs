@@ -8,7 +8,7 @@ const service = localService.getInstance();
 
 const TOKEN_SECRET = service.tokenSecret;
 
-export default abstract class BaseController<T> {
+export default abstract class BaseController {
   private readonly _config = {
     auth: {
       get: false,
@@ -104,6 +104,7 @@ export default abstract class BaseController<T> {
       .post(
         this._config.auth.post ? DoPrivateRequest : DoRequest,
         async (req, res) => {
+          res.send(req.body);
           try {
             const token = req.header("auth-token");
             if (token && token.length > 50) {

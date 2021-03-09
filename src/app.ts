@@ -2,6 +2,7 @@ import express, {
   Application,
 } from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 
 
 class App {
@@ -16,6 +17,15 @@ class App {
   }
 
   private setConfig() {
+    var bodyParser = require('body-parser');
+    // parse application/x-www-form-urlencoded
+    this.app.use(bodyParser.urlencoded({ extended: false }))
+
+    // parse application/json
+    this.app.use(bodyParser.json())
+
+    this.app.use(cors());
+    
   }
 
   useMorgan(format: string) {
