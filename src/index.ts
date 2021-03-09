@@ -87,7 +87,9 @@ export default class SpryJs {
     return app as any as _;
   }
 }
-
+export {
+  SpryConfig
+}
 
 if (typeof module !== 'undefined') {
   module.exports = Object.assign(SpryJs, module.exports);

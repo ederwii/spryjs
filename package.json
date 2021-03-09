@@ -1,12 +1,21 @@
 {
-  "name": "@ederwii/spry-js",
-  "version": "1.0.0",
-  "description": "JavaScript-based framework that enables rapid development of Web API's",
+  "name": "@codiks/spryjs",
+  "version": "1.0.2",
+  "description": "TypeScript-based framework that enables rapid development of Web API's",
   "main": "./lib/cjs/index.js",
+  "types": "./lib/cjs/index.d.ts",
   "module": "./lib/esm/index.js",
   "files": [
     "lib/"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ederwii/spryjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ederwii/spryjs/issues"
+  },
+  "homepage": "https://github.com/ederwii/spryjs#readme",
   "scripts": {
     "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
     "prepublish": "npm run tsc",
@@ -14,7 +23,11 @@
     "dev:debug": "nodemon --config nodemon.json --inspect-brk src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "express",
+    "spryjs",
+    "rapid"
+  ],
   "author": "Alan Martinez",
   "license": "ISC",
   "devDependencies": {
