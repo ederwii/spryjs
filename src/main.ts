@@ -1,33 +1,45 @@
 import application from "./app";
 import _http from "http";
 
-class SpryJs {
+class Main {
   _port: number | string;
   _server: any;
   _initialized = false;
 
-  constructor(cs: string, port?: string | number, callback = () => { }) {
+  constructor(port?: string | number, callback: Function = () => { }) {
     this._port = port ? this.normalizePort(port) : this.defaultPort;
-    this.initialize(cs, callback);
+    this.initialize(callback);
   }
 
-  enableMorgan() {
-    application.enableMorgan();
+  /** Enable morgan HTTP request logger middleware*/
+  useMorgan(format: string) {
+    application.useMorgan(format);
   }
 
-  private initialize(cs: string, callback = () => { }) {
-    application.getApp.set("port", this._port);
-    application.enabbleMongoose(cs).then(() => {
-      this._server = _http.createServer(application.getApp);
-
-      this._server.listen(this._port);
-      this._server.on("error", this.onError);
-      this._server.on("listening", this.onListening(this, callback));
+  /** Enable MongoDB initialization for data storage layer
+   * @param {string} connectionString - MongoDB Connection string
+   */
+  useMongo(connectionString: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      application.enabbleMongoose(connectionString).then(() => {
+        resolve(true);
+      }).catch((err) => reject(err))
     })
-
-
   }
 
+  /**
+   * Initialize Spry
+   * @param {Function} callback - Will be called when server is initialized
+   */
+  private initialize(callback: Function = () => { }) {
+    application.getApp.set("port", this._port);
+    this._server = _http.createServer(application.getApp);
+    this._server.listen(this._port);
+    this._server.on("error", this.onError);
+    this._server.on("listening", this.onListening(this, callback));
+  }
+
+  /** Server instance */
   get server() {
     return this._server;
   }
@@ -35,14 +47,19 @@ class SpryJs {
     this._server = val;
   }
 
+
   get defaultPort() {
     return process.env.PORT || '3000';
   }
 
-  get isInitialized() {
+  /** Get initialized state
+   * @returns {boolean} initialized state
+   */
+  get isInitialized(): boolean {
     return this._initialized;
   }
 
+  /** Get express application instance */
   get app() {
     if (!this._initialized) {
       throw new Error('SpryJs not initialized yet.');
@@ -72,7 +89,7 @@ class SpryJs {
     }
   }
 
-  private onListening(scope: any, callback = () => { }) {
+  private onListening(scope: any, callback: Function = () => { }) {
     return () => {
       var addr = scope._server.address();
       var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
@@ -99,4 +116,4 @@ class SpryJs {
   }
 }
 
-export default SpryJs;
+export default Main;

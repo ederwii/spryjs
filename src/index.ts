@@ -1,9 +1,10 @@
-import service from "./spryjs";
+import _ from "./main";
 import lservice from "./services/local.service";
 import FactoryController from "./controllers/factory.controller";
 import FactoryService from "./services/factory.service";
 import IService from "./base/service.interface";
 import mongoose, { Schema } from "mongoose";
+import { DEFAULT_MORGAN_FORMAT } from "./constants"
 let app: any;
 
 export default class SpryJs {
@@ -11,23 +12,41 @@ export default class SpryJs {
 
   }
 
-  init(mongo_cs: string, port?: number | string) {
+  /**
+   * Initialize Spry instance
+   * @param {number} port Port to listen 
+   * @returns {Promise<boolean>} Promise object 
+   */
+  init(port?: number | string): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      app = new service(mongo_cs, port, () => {
+      app = new _(port, () => {
         resolve(true);
       });
     })
   }
 
-  enableMorgan() {
-    this.app.enableMorgan();
+  /**
+   * Enable morgan HTTP request logger middleware.
+   * https://github.com/expressjs/morgan#readme
+   * @param {string} format - pre-defined formats. Defaults to 'dev'
+   */
+  useMorgan(format: string = DEFAULT_MORGAN_FORMAT) {
+    this.app.useMorgan(format);
   }
 
-  get app() {
-    return app as any as SpryJs;
+  /** Enable MongoDB initialization for data storage layer
+   * @param {string} connectionString - MongoDB Connection string
+   * @returns {Promise<boolean>} Promise with status of connection initialization
+   */
+  useMongo(connectionString: string): Promise<boolean> {
+    return this.app.useMongo(connectionString);
   }
 
-  registerEntity(name: string, model: Schema, path?: string, keyword?: string, service?: IService) {
+  private get app() {
+    return app as any as _;
+  }
+
+  registerEntity(name: string, model: Schema, path?: string, keyword?: string, service?: IService, config?: any) {
     if (!path) {
       path = name;
     }
@@ -37,7 +56,7 @@ export default class SpryJs {
     }
     var fixedPath = `/api/${path}`;
 
-    const controller = new FactoryController(app.app, fixedPath, service);
+    const controller = new FactoryController(app.app, fixedPath, service, config);
     lservice.getInstance().addEntity({
       name, path, service, controller
     })
@@ -49,10 +68,6 @@ export default class SpryJs {
     lservice.getInstance().entities.forEach(e => {
       console.log(e);
     })
-  }
-
-  useMorgan() {
-    
   }
 }
 

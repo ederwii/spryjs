@@ -2,7 +2,7 @@ import express, {
   Application,
 } from "express";
 import mongoose from "mongoose";
-import morgan from "morgan";
+
 
 class App {
   private app: Application;
@@ -18,8 +18,11 @@ class App {
   private setConfig() {
   }
 
-  enableMorgan() {
-    this.app.use(morgan("tiny"));
+  useMorgan(format: string) {
+    if (!format)
+      throw new Error('Morgan initialization requires a format')
+    const morgan = require("morgan");
+    this.app.use(morgan(format));
   }
 
   enabbleMongoose(cs: string): Promise<boolean> {

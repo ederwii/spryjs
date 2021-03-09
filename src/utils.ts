@@ -4,11 +4,25 @@ import localService from "./services/local.service"
 
 const service = localService.getInstance();
 
+/** Token Secret string for JWT validation */
 const TOKEN_SECRET = service.tokenSecret;
 
+/**
+ * Request handler for non-protected endpoints
+ * @param req Request object
+ * @param res Response object
+ * @param next Next function
+ */
 export const DoRequest = (req: Request, res: Response, next: NextFunction) => {
   next();
 }
+
+/**
+ * Request handler for protected endpoints
+ * @param req Request object
+ * @param res Response object
+ * @param next Next function
+ */
 export const DoPrivateRequest = (req: Request, res: Response, next: NextFunction) => {
   const token = req.header('auth-token');
   if (!token) {
@@ -26,7 +40,11 @@ export const DoPrivateRequest = (req: Request, res: Response, next: NextFunction
   }
 }
 
-export const uuidv4 = () => {
+/**
+ * Creates a new UUID v4 string
+ * @returns {string} UUID v4 string
+ */
+export const uuidv4 = (): string => {
   return "xx5xxxxx-xxxx-4xxx-yxxx-xxxxxxxxx5xx".replace(/[xy]/g, function (
     c
   ) {
