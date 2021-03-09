@@ -5,6 +5,7 @@ import FactoryService from "./services/factory.service";
 import IService from "./base/service.interface";
 import mongoose, { Schema } from "mongoose";
 import { DEFAULT_MORGAN_FORMAT } from "./constants"
+import { SpryConfig } from "./types/spry-config";
 let app: any;
 
 export default class SpryJs {
@@ -46,7 +47,7 @@ export default class SpryJs {
     return app as any as _;
   }
 
-  registerEntity(name: string, model: Schema, path?: string, keyword?: string, service?: IService, config?: any) {
+  registerEntity(name: string, model: Schema, path?: string, keyword?: string, config?: SpryConfig, service?: IService) {
     if (!path) {
       path = name;
     }

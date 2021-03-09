@@ -3,30 +3,33 @@ import { Application } from "express";
 import { DoRequest, DoPrivateRequest } from "../utils";
 import jwt from "jsonwebtoken";
 import localService from "../services/local.service"
+import { SpryConfig } from "../types/spry-config";
 
 const service = localService.getInstance();
 
 const TOKEN_SECRET = service.tokenSecret;
 
 export default abstract class BaseController {
-  private readonly _config = {
+  
+  private readonly _config: SpryConfig = {
     auth: {
       get: false,
       getById: false,
-      post: true,
-      patch: true,
-      delete: true,
-      put: true,
-    },
-  };
+      post: false,
+      patch: false,
+      delete: false,
+      put: false,
+    }
+  }
+
   constructor(
     private _app: Application,
     private service: IService,
     private baseApi: string,
-    config?: any
+    config?: SpryConfig
   ) {
     if (config) {
-      this._config = config;
+      Object.assign(this._config, config);
     }
   }
 
@@ -37,7 +40,7 @@ export default abstract class BaseController {
       .get(
         this._config.auth.get ? DoPrivateRequest : DoRequest,
         async (req, res) => {
-          
+
           const sortBy = req.query.sortBy
             ? req.query.sortBy.toString().split(",")
             : [];

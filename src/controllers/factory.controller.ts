@@ -1,9 +1,10 @@
 import { Application } from "express";
 import BaseController from "../base/base.controller";
 import IService from "../base/service.interface";
+import { SpryConfig } from "../types/spry-config";
 
 export default class FactoryController extends BaseController {
-  constructor(app: Application, baseApi: string, service: IService, config?: any) {
+  constructor(app: Application, baseApi: string, service: IService, config?: SpryConfig) {
     super(app, service, baseApi, config);
     this.registerRoutes();
   }
