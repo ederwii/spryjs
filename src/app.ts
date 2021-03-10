@@ -3,7 +3,7 @@ import express, {
 } from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-
+import passport from "passport";
 
 class App {
   private app: Application;
@@ -49,6 +49,14 @@ class App {
           reject(r);
         })
     })
+  }
+
+  usePassportLocal() {
+    var Strategy = require('passport-local').Strategy;
+
+    passport.use(new Strategy((username: string , password: string, cb: Function) => {
+      
+    }))
   }
 
 }
