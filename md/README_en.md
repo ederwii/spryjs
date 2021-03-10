@@ -3,6 +3,12 @@
 # spryjs :rocket:
 JavaScript-based framework that enables rapid development of Web API's.
 
+## Install
+
+`npm i @codiks/spryjs`
+
+## Description
+
 ### Register entities with a given model, full CRUD will be created
   * #### /api/entity   
     * GET 

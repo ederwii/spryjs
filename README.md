@@ -1,5 +1,7 @@
 # spryjs :rocket:
 
+`npm i @codiks/spryjs`
+
 ## [:us: :page_facing_up: English :point_left:](md/README_en.md)
 JavaScript-based framework that enables rapid development of Web API's.
 
