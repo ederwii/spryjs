@@ -6,22 +6,22 @@ import IService from "./base/service.interface";
 import mongoose, { Schema } from "mongoose";
 import { DEFAULT_MORGAN_FORMAT } from "./constants"
 import { SpryConfig } from "./types/spry-config";
+import { Application } from "express";
 let app: any;
 
 export default class SpryJs {
   constructor() {
-
   }
 
   /**
    * Initialize Spry instance
    * @param {number} port Port to listen 
-   * @returns {Promise<boolean>} Promise object 
+   * @returns {Promise<Application>} Express application object
    */
-  init(port?: number | string): Promise<boolean> {
+  init(port?: number | string): Promise<Application> {
     return new Promise((resolve, reject) => {
       app = new _(port, () => {
-        resolve(true);
+        resolve(app.app);
       });
     })
   }
@@ -55,24 +55,27 @@ export default class SpryJs {
    * @param {SpryConfig} config - Configuration object 
    * @param {IService} service - Service class for API logic 
    */
-  registerEntity(name: string, model: any, path?: string, keyword?: string, config?: SpryConfig, service?: IService) {
-    if (!path) {
-      path = name;
-    }
-    const m = new Schema(model, {
-      timestamps: lservice.getInstance().useTimestamps
-    });
-    const mm = mongoose.model(name, m);
-    if (!service) {
-      service = new FactoryService(mm, name, keyword)
-    }
-    var fixedPath = `/api/${path}`;
+  registerEntity(name: string, model: any, path?: string, keyword?: string, config?: SpryConfig, service?: IService): Promise<void> {
+    return new Promise((res, rej) => {
+      if (!path) {
+        path = name;
+      }
+      const m = new Schema(model, {
+        timestamps: lservice.getInstance().useTimestamps
+      });
+      const mm = mongoose.model(name, m);
+      if (!service) {
+        service = new FactoryService(mm, name, keyword)
+      }
+      var fixedPath = `/api/${path}`;
 
-    const controller = new FactoryController(app.app, fixedPath, service, config);
-    lservice.getInstance().addEntity({
-      name, path, service, controller
+      const controller = new FactoryController(app.app, fixedPath, service, config);
+      lservice.getInstance().addEntity({
+        name, path, service, controller
+      })
+      console.log(`Entity ${name} registered correctly. Full CRUD enabled on ${fixedPath}`);
+      res();
     })
-    console.log(`Entity ${name} registered correctly. Full CRUD enabled on ${fixedPath}`);
   }
 
   /** Print SpryJs configuration */
