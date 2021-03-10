@@ -1,6 +1,6 @@
 {
   "name": "@codiks/spryjs",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "TypeScript-based framework that enables rapid development of Web API's",
   "main": "./lib/cjs/index.js",
   "types": "./lib/cjs/index.d.ts",
