@@ -1,8 +1,40 @@
+import UserService from "./identity.service";
+import User, { IUser } from "../data/identity.model";
+
 export class service {
   private TOKEN_SECRET = '';
+  private SALT = '';
   private MONGO_CS = '';
   private ENTITIES: any[] = [];
   private USE_TIMESTAMPS: boolean = true;
+  private USER_SERVICE: UserService | undefined;
+
+  initializeUserService() {
+    this.USER_SERVICE = new UserService(this.TOKEN_SECRET, this.SALT);
+  }
+
+  createUser(user: IUser): Promise<void> {
+    return new Promise((res, rej) => {
+      this.USER_SERVICE && this.USER_SERVICE.Create(user).then(() => res())
+    })
+  }
+
+  authenticate(username: string, password: string): Promise<string> {
+    return new Promise((res, rej) => {
+      this.USER_SERVICE && this.USER_SERVICE.DoLogin(username, password).then((r) => res(r)).catch((err) => rej(err));
+    })
+  }
+
+  get canIdentityBeConfigured() {
+    return this.TOKEN_SECRET.length && this.SALT && this.USER_SERVICE == undefined;
+  }
+
+  get salt() {
+    return this.SALT;
+  }
+  set salt(val) {
+    this.SALT = val;
+  }
 
   get useTimestamps() {
     return this.USE_TIMESTAMPS;

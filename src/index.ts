@@ -7,6 +7,7 @@ import mongoose, { Schema } from "mongoose";
 import { DEFAULT_MORGAN_FORMAT } from "./constants"
 import { SpryConfig } from "./types/spry-config";
 import { Application } from "express";
+import { UserController } from "./controllers/identity.controller";
 let app: any;
 
 export default class SpryJs {
@@ -23,6 +24,22 @@ export default class SpryJs {
       app = new _(port, () => {
         resolve(app.app);
       });
+    })
+  }
+
+  useAuthentication(token_secret: string, salt: string):Promise<void> {
+    
+    return new Promise((res, rej) => {
+      lservice.getInstance().tokenSecret = token_secret;
+      lservice.getInstance().salt = salt;
+      lservice.getInstance().initializeUserService();
+
+      var fixedPath = `/api/user`;
+
+      new UserController(app.app);
+      
+      console.log(`Authentication enabled. Endpoint created: ${fixedPath}`);
+      res();
     })
   }
 
