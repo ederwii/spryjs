@@ -4,6 +4,9 @@ JavaScript-based framework that enables rapid development of Web API's.
 ### [:es: :page_facing_up: Español :point_left:](md/README_es.md)
 Consulta la documentación en Español.
 
+## Example
+Checkout the [spryjs-example](https://github.com/ederwii/spryjs-example) repo for full example reference.
+
 ## Install
 
 `npm i @codiks/spryjs`
@@ -45,25 +48,57 @@ The following code will create a full CRUD endpoint on `localhost:5000/api/bookm
 
 `index.ts`
 ```typescript
-import SpryJs from "@codiks/spryjs";
-import Book from "./entities/book";
-import { MONGO_CS } from "./constants"
+/** dotenv */
+import dotenv from 'dotenv';
+dotenv.config();
 
-const app = new SpryJs();
+import SpryJs, { EntityConfig } from "@codiks/spryjs";
+import Book from "./entities/book";
+import { MONGO_CS, TOKEN_SECRET, SALT, PORT } from "./constants"
+
+const spryjs = new SpryJs();
 
 /**Initialize SpryJs */
-app.init(5000).then(() => {
+spryjs.init(PORT).then((app) => {
+
   /** Enable MongoDB. Need to pass connection string as a parameter*/
-  app.useMongo(MONGO_CS);
+  spryjs.useMongo(`${MONGO_CS}`);
 
   /** Enable morgan middleware */
-  app.useMorgan();
+  spryjs.useMorgan();
 
-  /** Register entity. This will create the CRUD endpoints for /bookmanagement 
-   * using Book entity for persistance.
+  /** Enable authentication. This will create the /api/user endpoint with the default user schema
+   * (username, password). POST action will act as the register endpoint. The body must contain a JSON object
+   * with username and password variables. Once registered, 
    */
-  app.registerEntity('Book', Book, 'bookmanagement', 'name');
+  spryjs.useAuthentication(`${TOKEN_SECRET}`, `${SALT}`);
+
+  /** Register Book entity. This will create the CRUD endpoints for /bm 
+   * using Book entity for persistance.
+   * Notice that some enpoints are protected for only authorized users
+   */
+  let bookConfig: EntityConfig = {
+    name: 'Book',
+    model: Book,
+    path: 'bm',
+    keyword: 'code',
+    config: {
+      /** Let's protect some endpoints to only authorized users.
+       * All other endpoints not mentioned in auth object will be non-protected
+       * and will not require a token in the authorization header
+      */
+      auth: {
+        post: true,
+        delete: true,
+        put: true
+      }
+    }
+  }
+  spryjs.registerEntity(bookConfig).then(() => {
+  })
 })
+
+
 ```
 
 # :bomb: Important :bomb:

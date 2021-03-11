@@ -3,6 +3,9 @@
 # spryjs :rocket:
 Framework basado en JavaScript que permite el desarrollo rápido de API web.
 
+## Ejemplo
+Echa un vistazo al repositorio [spryjs-example](https://github.com/ederwii/spryjs-example) para un ejemplo completo.
+
 ## Instalación
 
 `npm i @codiks/spryjs`
