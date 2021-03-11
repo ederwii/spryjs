@@ -8,9 +8,10 @@ export class service {
   private ENTITIES: any[] = [];
   private USE_TIMESTAMPS: boolean = true;
   private USER_SERVICE: UserService | undefined;
+  private EXPIRES_IN = 0;
 
   initializeUserService() {
-    this.USER_SERVICE = new UserService(this.TOKEN_SECRET, this.SALT);
+    this.USER_SERVICE = new UserService(this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN);
   }
 
   createUser(user: IUser): Promise<void> {
@@ -23,6 +24,13 @@ export class service {
     return new Promise((res, rej) => {
       this.USER_SERVICE && this.USER_SERVICE.DoLogin(username, password).then((r) => res(r)).catch((err) => rej(err));
     })
+  }
+
+  get expiresIn() {
+    return this.EXPIRES_IN;
+  }
+  set expiresIn(val) {
+    this.EXPIRES_IN = val;
   }
 
   get userService() {

@@ -27,11 +27,11 @@ export default class SpryJs {
     })
   }
 
-  useAuthentication(token_secret: string, salt: string):Promise<void> {
-    
+  useAuthentication(token_secret: string, salt: string, expiresIn: number = 86400):Promise<void> {
     return new Promise((res, rej) => {
       lservice.getInstance().tokenSecret = token_secret;
       lservice.getInstance().salt = salt;
+      lservice.getInstance().expiresIn = expiresIn;
       lservice.getInstance().initializeUserService();
 
       var fixedPath = `/api/user`;

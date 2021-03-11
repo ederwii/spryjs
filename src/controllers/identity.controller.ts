@@ -6,7 +6,7 @@ import { DoRequest } from "../utils";
 
 const service = lservice.getInstance();
 const BASE_API = "/api/user";
-const userService = new IdentityService(service.tokenSecret, service.salt);
+const userService = new IdentityService(service.tokenSecret, service.salt, service.expiresIn);
 
 export class UserController extends BaseController {
   constructor(private app: Application) {
