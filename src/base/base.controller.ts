@@ -1,6 +1,6 @@
 import IService from "./service.interface";
 import { Application } from "express";
-import { DoRequest, DoPrivateRequest } from "../utils";
+import { DoRequest, DoPrivateRequest, tokenCheckMap } from "../utils";
 import jwt from "jsonwebtoken";
 import localService from "../services/local.service"
 import { SpryConfig } from "../types/spry-config";
@@ -107,16 +107,8 @@ export default abstract class BaseController {
       .post(
         this._config.auth.post ? DoPrivateRequest : DoRequest,
         async (req, res) => {
-          res.send(req.body);
           try {
-            const token = req.header("auth-token");
-            if (token && token.length > 50) {
-              const verified: any = jwt.verify(
-                token ? token.toString() : "",
-                TOKEN_SECRET
-              );
-              req.body["userId"] = verified._id;
-            }
+            tokenCheckMap(req);
             await this.service
               .Create(req.body)
               .then((result: any) => {
@@ -150,12 +142,7 @@ export default abstract class BaseController {
       .patch(
         this._config.auth.patch ? DoPrivateRequest : DoRequest,
         async (req, res) => {
-          const token = req.header("auth-token");
-          const verified: any = jwt.verify(
-            token ? token.toString() : "",
-            TOKEN_SECRET
-          );
-          req.body["userId"] = verified._id;
+          tokenCheckMap(req);
           const id = req.params.id;
           try {
             await this.service
@@ -192,14 +179,7 @@ export default abstract class BaseController {
       .put(
         this._config.auth.put ? DoPrivateRequest : DoRequest,
         async (req, res) => {
-          const token = req.header("auth-token");
-          if (token && token.length > 50) {
-            const verified: any = jwt.verify(
-              token ? token.toString() : "",
-              TOKEN_SECRET
-            );
-            req.body["userId"] = verified._id;
-          }
+          tokenCheckMap(req);
           this.service
             .Update(req.params.id, req.body)
             .then(() => {

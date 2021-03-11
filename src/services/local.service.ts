@@ -25,6 +25,10 @@ export class service {
     })
   }
 
+  get userService() {
+    return this.USER_SERVICE
+  }
+
   get canIdentityBeConfigured() {
     return this.TOKEN_SECRET.length && this.SALT && this.USER_SERVICE == undefined;
   }

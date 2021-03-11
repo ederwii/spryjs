@@ -29,7 +29,7 @@ export class UserController extends BaseController {
       .route(`${BASE_API}/login`)
       .post(DoRequest, async (req, res) => {
         service.authenticate(req.body.username, req.body.password).then((token) => {
-          res.send(token);
+          res.json({ token });
         }).catch((err) => {
           res.sendStatus(500);
           console.error(err);

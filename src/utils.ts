@@ -5,7 +5,7 @@ import localService from "./services/local.service"
 const service = localService.getInstance();
 
 /** Token Secret string for JWT validation */
-const TOKEN_SECRET = service.tokenSecret;
+let TOKEN_SECRET = service.tokenSecret;
 
 /**
  * Request handler for non-protected endpoints
@@ -24,19 +24,18 @@ export const DoRequest = (req: Request, res: Response, next: NextFunction) => {
  * @param next Next function
  */
 export const DoPrivateRequest = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('auth-token');
-  if (!token) {
-    return res.status(401).send();
-  }
-  try {
-    const verified = jwt.verify(token, TOKEN_SECRET);
-    if (verified) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    res.sendStatus(401);
+  } else {
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, service.tokenSecret, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+      req.body.user = user;
       next();
-    } else {
-      res.status(401).send();
-    }
-  } catch (error) {
-    res.status(401).send();
+    });
   }
 }
 
@@ -52,4 +51,16 @@ export const uuidv4 = (): string => {
       v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+}
+
+
+export const tokenCheckMap = (req: Request) => {
+  const token = req.header("auth-token");
+  if (token && token.length > 50) {
+    const verified: any = jwt.verify(
+      token ? token.toString() : "",
+      TOKEN_SECRET
+    );
+    req.body["userId"] = verified._id;
+  }
 }

@@ -53,14 +53,10 @@ export default abstract class BaseService implements IService {
   async Create(payload: Partial<any>): Promise<any> {
     return new Promise<any>(async (resolve, reject) => {
       const data: any = { ...payload };
-      if (!payload.hasOwnProperty("code")) {
-        data.code = await this.GetCount();
-        data.code++;
-      }
       const newRecord = new this._entity(data);
       try {
         const created = await newRecord.save();
-        resolve(created);
+        resolve(created._id);
       } catch (err) {
         console.log(err);
         throw new Error();
