@@ -6,6 +6,7 @@ import IService from "./base/service.interface";
 import mongoose, { Schema } from "mongoose";
 import { DEFAULT_MORGAN_FORMAT } from "./constants"
 import { SpryConfig } from "./types/spry-config";
+import { EntityConfig } from "./types/entity-config";
 import { Application } from "express";
 import { UserController } from "./controllers/identity.controller";
 let app: any;
@@ -27,7 +28,14 @@ export default class SpryJs {
     })
   }
 
-  useAuthentication(token_secret: string, salt: string, expiresIn: number = 86400):Promise<void> {
+  /**
+   * Enable JWT authentication.
+   * @param {string} token_secret - String to be used for token security 
+   * @param {string} salt - String to be used for user password encryption
+   * @param {number} expiresIn - In seconds: Time for token to expire. Defaults to 24 hours 
+   * @returns {Promise} Void promise
+   */
+  useAuthentication(token_secret: string, salt: string, expiresIn: number = 86400): Promise<void> {
     return new Promise((res, rej) => {
       lservice.getInstance().tokenSecret = token_secret;
       lservice.getInstance().salt = salt;
@@ -37,7 +45,7 @@ export default class SpryJs {
       var fixedPath = `/api/user`;
 
       new UserController(app.app);
-      
+
       console.log(`Authentication enabled. Endpoint created: ${fixedPath}`);
       res();
     })
@@ -65,32 +73,39 @@ export default class SpryJs {
 
   /**
    * Register new entity in the application
-   * @param {string} name - Name of the entity. 
-   * @param {any} model - Model for the entity  
-   * @param {string} path - Path for the API endpoint. Defaults to the name of the entity 
-   * @param {string} keyword - Property name to be used with searchByKeyword method 
-   * @param {SpryConfig} config - Configuration object 
-   * @param {IService} service - Service class for API logic 
+   * @param {EntityConfig} config - Entity configuration related
+   * @param {string} config.name - Name of the entity.
+   * @param {any} config.model - Model for the entity
+   * @param {string} config.path - Path for the API endpoint. Defaults to the name of the entity
+   * @param {string} config.keyword - Property name to be used with searchByKeyword method
+   * @param {SpryConfig} config.config - Configuration object
+   * @param {IService} config.service - Service class for API logic. If no service is provided, default service will be created
    */
-  registerEntity(name: string, model: any, path?: string, keyword?: string, config?: SpryConfig, service?: IService): Promise<void> {
+  registerEntity(config: EntityConfig): Promise<void> {
     return new Promise((res, rej) => {
-      if (!path) {
-        path = name;
+      if (!config.path) {
+        config.path = config.name;
       }
-      const m = new Schema(model, {
+      const m = new Schema(config.model, {
         timestamps: lservice.getInstance().useTimestamps
       });
-      const mm = mongoose.model(name, m);
-      if (!service) {
-        service = new FactoryService(mm, name, keyword)
+      const mm = mongoose.model(config.name, m);
+      if (!config.service) {
+        config.service = new FactoryService(mm, config.name, config.keyword)
       }
-      var fixedPath = `/api/${path}`;
+      var fixedPath = `/api/${config.path}`;
 
-      const controller = new FactoryController(app.app, fixedPath, service, config);
+      const controller = new FactoryController(app.app, fixedPath, config.service, config.config);
+
       lservice.getInstance().addEntity({
-        name, path, service, controller
+        name: config.name,
+        path: config.path,
+        service: config.service,
+        controller,
+        config: config.config
       })
-      console.log(`Entity ${name} registered correctly. Full CRUD enabled on ${fixedPath}`);
+      
+      console.log(`Entity ${config.name} registered correctly. Full CRUD enabled on ${fixedPath}`);
       res();
     })
   }
@@ -108,7 +123,8 @@ export default class SpryJs {
   }
 }
 export {
-  SpryConfig
+  SpryConfig,
+  EntityConfig
 }
 
 if (typeof module !== 'undefined') {

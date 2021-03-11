@@ -16,10 +16,14 @@ export default abstract class BaseController {
       get: false,
       getById: false,
       post: false,
-      patch: false,
       delete: false,
       put: false,
-    }
+    },
+    noGet: false,
+    noDelete: false,
+    noGetById: false,
+    noPost: false,
+    noPut: false
   }
 
   constructor(
@@ -35,7 +39,8 @@ export default abstract class BaseController {
 
   public registerRoutes() {
     console.log('Register path ' + this.baseApi);
-    this._app
+
+    !this._config.noGet && this._app
       .route(this.baseApi.toLowerCase())
       .get(
         this._config.auth.get ? DoPrivateRequest : DoRequest,
@@ -103,7 +108,10 @@ export default abstract class BaseController {
             res.status(500).send(err);
           }
         }
-      )
+      );
+
+    !this._config.noPost && this._app
+      .route(this.baseApi.toLowerCase())
       .post(
         this._config.auth.post ? DoPrivateRequest : DoRequest,
         async (req, res) => {
@@ -112,7 +120,7 @@ export default abstract class BaseController {
             await this.service
               .Create(req.body)
               .then((result: any) => {
-                res.status(200).send(result);
+                res.status(200).json({ _id: result });
               })
               .catch((err: any) => {
                 res.status(500).send(err.message);
@@ -121,7 +129,7 @@ export default abstract class BaseController {
         }
       );
 
-    this._app
+    !this._config.noGetById && this._app
       .route(`${this.baseApi.toLowerCase()}/:id`)
       .get(
         this._config.auth.getById ? DoPrivateRequest : DoRequest,
@@ -139,28 +147,9 @@ export default abstract class BaseController {
             });
         }
       )
-      .patch(
-        this._config.auth.patch ? DoPrivateRequest : DoRequest,
-        async (req, res) => {
-          tokenCheckMap(req);
-          const id = req.params.id;
-          try {
-            await this.service
-              .Patch(req.body.operations, id)
-              .then((result: any) => {
-                res.status(200).send(result);
-              })
-              .catch((err: any) => {
-                res.status(500).send({
-                  error: err,
-                });
-              });
-          } catch (ex) {
-            console.log(ex);
-            throw Error();
-          }
-        }
-      )
+
+    !this._config.noDelete && this._app
+      .route(`${this.baseApi.toLowerCase()}/:id`)
       .delete(
         this._config.auth.delete ? DoPrivateRequest : DoRequest,
         async (req, res) => {
@@ -176,6 +165,9 @@ export default abstract class BaseController {
           );
         }
       )
+
+    !this._config.noPut && this._app
+      .route(`${this.baseApi.toLowerCase()}/:id`)
       .put(
         this._config.auth.put ? DoPrivateRequest : DoRequest,
         async (req, res) => {

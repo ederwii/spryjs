@@ -2,7 +2,7 @@ import { Application } from "express";
 import IdentityService from "../services/identity.service";
 import lservice from "../services/local.service";
 import BaseController from "../base/base.controller";
-import { DoRequest } from "../utils";
+import { DoRequest, DoPrivateRequest } from "../utils";
 
 const service = lservice.getInstance();
 const BASE_API = "/api/user";
@@ -12,10 +12,8 @@ export class UserController extends BaseController {
   constructor(private app: Application) {
     super(app, userService, BASE_API, {
       auth: {
-        get: true,
         getById: true,
         post: false,
-        patch: true,
         delete: true,
         put: true,
       },
@@ -35,5 +33,13 @@ export class UserController extends BaseController {
           console.error(err);
         })
       });
+
+    this.app
+      .route(`${BASE_API}/password`)
+      .put(DoPrivateRequest, async (req, res) => {
+        const result = await userService.ChangePassword(req.body.user, req.body.password, req.body.newPassword);
+        if (result) res.sendStatus(200);
+        else res.send(403);
+      })
   }
 }

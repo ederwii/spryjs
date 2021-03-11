@@ -44,12 +44,36 @@ export default class UserService extends BaseService {
           }
         }
       })
-      
-   })
+
+    })
   }
 
   generatePassword = async (password: string) => {
     await bcrypt.genSalt(10).then((result) => (this.SALT = result));
     return await bcrypt.hash(password, this.SALT);
+  };
+
+  ChangePassword = async (user: any, password: string, newPassword: string) => {
+    const validUser = await User.findById(user._id);
+    if (!validUser) {
+      return false;
+    } else {
+      const validPass = await bcrypt.compare(
+        password,
+        validUser.password
+      );
+      if (!validPass) {
+        false;
+      } else {
+        validUser.password = await this.generatePassword(newPassword);
+        validUser.save().then((result) => {
+          if (result) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+      }
+    }
   };
 }
