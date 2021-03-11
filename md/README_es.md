@@ -37,6 +37,7 @@ Documentación pendiente
 export const Libro = {
   nombre: String,
   descripcion: String,
+  code: String
 }
 
 export default Libro;
@@ -49,7 +50,7 @@ El siguiente código creará los endpoints necesarios para las operaciones CRUD 
 ```typescript
 import SpryJs from "@codiks/spryjs";
 import Libro from "./entidades/libros";
-import { MONGO_CS } from "./constantes"
+import { MONGO_CS, TOKEN_SECRET, SALT, PORT } from "./constants"
 
 const app = new SpryJs();
 
@@ -61,10 +62,34 @@ app.init(5000).then(() => {
   /** Habilita el middleware Morgan */
   app.useMorgan();
 
-  /** Registra una entidad. Esto creará los endpoints CRUD para la ruta /api/manejolibros
+  /** Enable authentication. This will create the /api/user endpoint with the default user schema
+   * (username, password). POST action will act as the register endpoint. The body must contain a JSON object
+   * with username and password variables. Once registered, 
+   */
+  spryjs.useAuthentication(`${TOKEN_SECRET}`, `${SALT}`);
+
+  /** Registra una entidad. Esto creará los endpoints CRUD para la ruta /api/bm
    * utilizando la entidad Libro para la persistencia de la información
    */
   
-  app.registerEntity('Libro', Libro, 'manejolibros', 'nombre');
+   let bookConfig: EntityConfig = {
+    name: 'Book',
+    model: Book,
+    path: 'bm',
+    keyword: 'code',
+    config: {
+      /** Let's protect some endpoints to only authorized users.
+       * All other endpoints not mentioned in auth object will be non-protected
+       * and will not require a token in the authorization header
+      */
+      auth: {
+        post: true,
+        delete: true,
+        put: true
+      }
+    }
+  }
+  spryjs.registerEntity(bookConfig).then(() => {
+  })
 })
 ```
