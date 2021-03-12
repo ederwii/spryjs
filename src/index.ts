@@ -92,8 +92,9 @@ export default class SpryJs {
       const m = new Schema(config.model, {
         timestamps: lservice.getInstance().useTimestamps
       });
-      const mm = mongoose.model(config.name, m);
+      
       if (!config.service) {
+        const mm = mongoose.model(config.name, m);
         config.service = new FactoryService(mm, config.name, config.keyword)
       }
       var fixedPath = `/api/${config.path}`;
@@ -110,43 +111,6 @@ export default class SpryJs {
       })
 
       console.log(`Entity ${config.name} registered correctly. Full CRUD enabled on ${fixedPath}`);
-      res();
-    })
-  }
-
-  /**
-   * Register new entity in the application
-   * @param {EntityConfig} config - Entity configuration related
-   * @param {string} config.name - Name of the entity.
-   * @param {string} config.path - Path for the API endpoint. Defaults to the name of the entity
-   * @param {string} config.keyword - Property name to be used with searchByKeyword method
-   * @param {SpryConfig} config.config - Configuration object
-   * @param {IService} config.service - Service class for API logic. Must be provided.
-   */
-  registerMongoEntity(config: EntityConfig): Promise<void> {
-    if (!config.service)
-      throw new Error("Service must be provided");
-
-    return new Promise((res, rej) => {
-      if (!config.path) {
-        config.path = config.name;
-      }
-      if (config.service) {
-
-        var fixedPath = `/api/${config.path}`;
-
-        const controller = new FactoryController(app.app, fixedPath, config.service, config.config);
-
-        this.addEntity({
-          name: config.name,
-          path: config.path,
-          service: config.service,
-          controller,
-          config: config.config
-        })
-
-        console.log(`Entity ${config.name} registered correctly. Full CRUD enabled on ${fixedPath}`);
-      }
       res();
     })
   }
