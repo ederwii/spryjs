@@ -2,7 +2,7 @@ import _ from "./main";
 import lservice from "./services/local.service";
 import FactoryController from "./controllers/factory.controller";
 import FactoryService from "./services/factory.service";
-import IService from "./base/service.interface";
+import BaseService from "./base/base.service";
 import mongoose, { Schema } from "mongoose";
 import { DEFAULT_MORGAN_FORMAT } from "./constants"
 import { SpryConfig } from "./types/spry-config";
@@ -97,15 +97,53 @@ export default class SpryJs {
 
       const controller = new FactoryController(app.app, fixedPath, config.service, config.config);
 
-      lservice.getInstance().addEntity({
+      this.addEntity({
         name: config.name,
         path: config.path,
         service: config.service,
         controller,
-        config: config.config
+        config: config.config,
+        dbmodel: m
       })
-      
+
       console.log(`Entity ${config.name} registered correctly. Full CRUD enabled on ${fixedPath}`);
+      res();
+    })
+  }
+
+  /**
+   * Register new entity in the application
+   * @param {EntityConfig} config - Entity configuration related
+   * @param {string} config.name - Name of the entity.
+   * @param {string} config.path - Path for the API endpoint. Defaults to the name of the entity
+   * @param {string} config.keyword - Property name to be used with searchByKeyword method
+   * @param {SpryConfig} config.config - Configuration object
+   * @param {IService} config.service - Service class for API logic. Must be provided.
+   */
+  registerMongoEntity(config: EntityConfig): Promise<void> {
+    if (!config.service)
+      throw new Error("Service must be provided");
+
+    return new Promise((res, rej) => {
+      if (!config.path) {
+        config.path = config.name;
+      }
+      if (config.service) {
+
+        var fixedPath = `/api/${config.path}`;
+
+        const controller = new FactoryController(app.app, fixedPath, config.service, config.config);
+
+        this.addEntity({
+          name: config.name,
+          path: config.path,
+          service: config.service,
+          controller,
+          config: config.config
+        })
+
+        console.log(`Entity ${config.name} registered correctly. Full CRUD enabled on ${fixedPath}`);
+      }
       res();
     })
   }
@@ -118,13 +156,18 @@ export default class SpryJs {
     })
   }
 
+  private addEntity(entity: any): void {
+    lservice.getInstance().addEntity(entity);
+  }
+
   private get app() {
     return app as any as _;
   }
 }
 export {
   SpryConfig,
-  EntityConfig
+  EntityConfig,
+  BaseService
 }
 
 if (typeof module !== 'undefined') {
