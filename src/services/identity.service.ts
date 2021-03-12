@@ -1,15 +1,14 @@
-import User, { IUser } from "../data/identity.model";
 import BaseService from "../base/base.service";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export default class UserService extends BaseService {
-  constructor(private TOKEN_SECRET: string, private SALT: string, private EXPIRES_IN: number) {
-    super(User, "User", 'username');
+export default class IdentityService extends BaseService {
+  constructor(private TOKEN_SECRET: string, private SALT: string, private EXPIRES_IN: number, private USER: any) {
+    super(USER, "User", 'username');
   }
 
-  async Create(payload: IUser): Promise<IUser> {
-    const existingUser = await User.findOne({ username: payload.username });
+  async Create(payload: any): Promise<any> {
+    const existingUser = await this.USER.findOne({ username: payload.username });
     if (!existingUser) {
       payload.password = await this.generatePassword(payload.password);
       return await super.Create(payload);
@@ -18,7 +17,7 @@ export default class UserService extends BaseService {
 
   async DoLogin(username: string, password: string): Promise<string> {
     return new Promise((res, rej) => {
-      User.findOne({ username }).then(async (validUser) => {
+      this.USER.findOne({ username }).then(async (validUser: any) => {
         if (!validUser) {
           rej();
         } else {
@@ -54,7 +53,7 @@ export default class UserService extends BaseService {
   };
 
   ChangePassword = async (user: any, password: string, newPassword: string) => {
-    const validUser = await User.findById(user._id);
+    const validUser = await this.USER.findById(this.USER._id);
     if (!validUser) {
       return false;
     } else {
@@ -66,7 +65,7 @@ export default class UserService extends BaseService {
         false;
       } else {
         validUser.password = await this.generatePassword(newPassword);
-        validUser.save().then((result) => {
+        validUser.save().then((result: any) => {
           if (result) {
             return true;
           } else {

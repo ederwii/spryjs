@@ -1,5 +1,5 @@
 import UserService from "./identity.service";
-import User, { IUser } from "../data/identity.model";
+import mongoose, { Schema } from "mongoose";
 
 export class service {
   private TOKEN_SECRET = '';
@@ -9,12 +9,19 @@ export class service {
   private USE_TIMESTAMPS: boolean = true;
   private USER_SERVICE: UserService | undefined;
   private EXPIRES_IN = 0;
+  private USER_MODEL: any = undefined;
 
   initializeUserService() {
-    this.USER_SERVICE = new UserService(this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN);
+    const UserSchema: Schema = new Schema(
+      this.USER_MODEL,
+      { timestamps: true }
+    );
+
+    var model = mongoose.model("User", UserSchema);
+    this.USER_SERVICE = new UserService(this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN, model);
   }
 
-  createUser(user: IUser): Promise<void> {
+  createUser(user: any): Promise<void> {
     return new Promise((res, rej) => {
       this.USER_SERVICE && this.USER_SERVICE.Create(user).then(() => res())
     })
@@ -24,6 +31,13 @@ export class service {
     return new Promise((res, rej) => {
       this.USER_SERVICE && this.USER_SERVICE.DoLogin(username, password).then((r) => res(r)).catch((err) => rej(err));
     })
+  }
+
+  get userModel() {
+    return this.USER_MODEL;
+  }
+  set userModel(val) {
+    this.USER_MODEL = val;
   }
 
   get expiresIn() {

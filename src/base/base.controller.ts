@@ -28,8 +28,8 @@ export default abstract class BaseController {
 
   constructor(
     private _app: Application,
-    private service: IService,
     private baseApi: string,
+    private service: IService,
     config?: SpryConfig
   ) {
     if (config) {

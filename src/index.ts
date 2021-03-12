@@ -33,18 +33,21 @@ export default class SpryJs {
    * @param {string} token_secret - String to be used for token security 
    * @param {string} salt - String to be used for user password encryption
    * @param {number} expiresIn - In seconds: Time for token to expire. Defaults to 24 hours 
+   * @param {any} model - user model to be used. Must include username and password
    * @returns {Promise} Void promise
    */
-  useAuthentication(token_secret: string, salt: string, expiresIn: number = 86400): Promise<void> {
+  useAuthentication(token_secret: string, salt: string, model: any = { username: String, password: String }, expiresIn: number = 86400): Promise<void> {
     return new Promise((res, rej) => {
       lservice.getInstance().tokenSecret = token_secret;
       lservice.getInstance().salt = salt;
       lservice.getInstance().expiresIn = expiresIn;
+      lservice.getInstance().userModel = model;
       lservice.getInstance().initializeUserService();
 
       var fixedPath = `/api/user`;
 
-      new UserController(app.app);
+      let service = lservice.getInstance().userService;
+      service && new UserController(app.app, service);
 
       console.log(`Authentication enabled. Endpoint created: ${fixedPath}`);
       res();
