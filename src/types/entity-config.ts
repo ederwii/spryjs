@@ -3,7 +3,7 @@ import IService from "../base/service.interface";
 
 export type EntityConfig = {
   name: string,
-  model: any,
+  model?: any,
   path?: string,
   keyword?: string,
   service?: IService,
