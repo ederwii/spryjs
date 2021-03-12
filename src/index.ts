@@ -3,6 +3,7 @@ import lservice from "./services/local.service";
 import FactoryController from "./controllers/factory.controller";
 import FactoryService from "./services/factory.service";
 import BaseService from "./base/base.service";
+import IService from "./base/service.interface";
 import mongoose, { Schema } from "mongoose";
 import { DEFAULT_MORGAN_FORMAT } from "./constants"
 import { SpryConfig } from "./types/spry-config";
@@ -134,7 +135,8 @@ export default class SpryJs {
 export {
   SpryConfig,
   EntityConfig,
-  BaseService
+  BaseService,
+  IService
 }
 
 if (typeof module !== 'undefined') {
