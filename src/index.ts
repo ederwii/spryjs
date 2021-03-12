@@ -101,7 +101,7 @@ export class SpryJs {
       }
       var fixedPath = `/api/${config.path}`;
 
-      const controller = new FactoryController(app.app, fixedPath, config.service, config.config);
+      const controller = new FactoryController(app.app, fixedPath, config.service, config.config, config.routes);
 
       this.addEntity({
         name: config.name,

@@ -1,7 +1,6 @@
 import IService from "./service.interface";
 import { Application } from "express";
 import { DoRequest, DoPrivateRequest, tokenCheckMap } from "../utils";
-import jwt from "jsonwebtoken";
 import localService from "../services/local.service"
 import { SpryConfig } from "../types/spry-config";
 
@@ -18,12 +17,14 @@ export default abstract class BaseController {
       post: false,
       delete: false,
       put: false,
+      patch: false
     },
     noGet: false,
     noDelete: false,
     noGetById: false,
     noPost: false,
-    noPut: false
+    noPut: false,
+    noPatch: false
   }
 
   constructor(
@@ -174,6 +175,23 @@ export default abstract class BaseController {
           tokenCheckMap(req);
           this.service
             .Update(req.params.id, req.body)
+            .then(() => {
+              res.send();
+            })
+            .catch((err: any) => {
+              res.status(500).send(err);
+            });
+        }
+    );
+    
+    !this._config.noPatch && this._app
+      .route(`${this.baseApi.toLowerCase()}/:id`)
+      .patch(
+        this._config.auth.put ? DoPrivateRequest : DoRequest,
+        async (req, res) => {
+          tokenCheckMap(req);
+          this.service
+            .Patch(req.body, req.params.id)
             .then(() => {
               res.send();
             })

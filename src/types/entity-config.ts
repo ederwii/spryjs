@@ -8,4 +8,5 @@ export type EntityConfig = {
   keyword?: string,
   service?: IService,
   config: SpryConfig,
+  routes?: any[]
 }

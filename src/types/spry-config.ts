@@ -5,6 +5,7 @@ export type SpryConfig = {
   noPost?: boolean;
   noDelete?: boolean;
   noPut?: boolean;
+  noPatch?: boolean
 }
 
 export type SpryConfigAuth = {
@@ -13,4 +14,5 @@ export type SpryConfigAuth = {
   post?: boolean,
   delete?: boolean,
   put?: boolean,
+  patch?: boolean
 }
