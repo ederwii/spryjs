@@ -1,7 +1,7 @@
 import IService, { IPatchOperation } from "./service.interface";
 import mongoose from "mongoose";
 
-export default abstract class BaseService implements IService {
+export default class BaseService implements IService {
   public _entity: any;
   public keywordField: string;
   public entityName: string;

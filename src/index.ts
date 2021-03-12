@@ -10,9 +10,10 @@ import { SpryConfig } from "./types/spry-config";
 import { EntityConfig } from "./types/entity-config";
 import { Application } from "express";
 import { UserController } from "./controllers/identity.controller";
+import { IPatchOperation } from "./base/service.interface";
 let app: any;
 
-export default class SpryJs {
+export class SpryJs {
   constructor() {
   }
 
@@ -93,7 +94,7 @@ export default class SpryJs {
       const m = new Schema(config.model, {
         timestamps: lservice.getInstance().useTimestamps
       });
-      
+
       if (!config.service) {
         const mm = mongoose.model(config.name, m);
         config.service = new FactoryService(mm, config.name, config.keyword)
@@ -124,6 +125,11 @@ export default class SpryJs {
     })
   }
 
+  /** Create new model for MongoDB */
+  createModel(name: string, schema: Schema): mongoose.Model<any, {}> {
+    return mongoose.model(name, schema);
+  }
+
   private addEntity(entity: any): void {
     lservice.getInstance().addEntity(entity);
   }
@@ -136,9 +142,26 @@ export {
   SpryConfig,
   EntityConfig,
   BaseService,
-  IService
+  IService,
+  IPatchOperation
 }
 
+class Singleton {
+  // Use the `Logger` type
+  private static instance: SpryJs
+  // Use a private constructor
+  private constructor() { }
+  // Ensure that there is only one instance created
+  public static getInstance(): SpryJs {
+    if (!Singleton.instance) {
+      Singleton.instance = new SpryJs()
+    }
+    return Singleton.instance
+  }
+}
+
+export default Singleton.getInstance();
+
 if (typeof module !== 'undefined') {
-  module.exports = Object.assign(SpryJs, module.exports);
+  module.exports = Object.assign(Singleton.getInstance(), module.exports);
 }
