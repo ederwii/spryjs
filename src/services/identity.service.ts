@@ -1,9 +1,7 @@
 import BaseService from "../base/base.service";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 
 export default class IdentityService extends BaseService {
-  constructor(private TOKEN_SECRET: string, private SALT: string, private EXPIRES_IN: number, private USER: any) {
+  constructor(private bcrypt: any, private jwt: any, private TOKEN_SECRET: string, private SALT: string, private EXPIRES_IN: number, private USER: any) {
     super(USER, "User", 'username');
   }
 
@@ -21,7 +19,7 @@ export default class IdentityService extends BaseService {
         if (!validUser) {
           rej();
         } else {
-          const validPass = await bcrypt.compare(
+          const validPass = await this.bcrypt.compare(
             password,
             validUser.password
           );
@@ -31,7 +29,7 @@ export default class IdentityService extends BaseService {
             let info: any = {
               id: validUser._id
             };
-            let token = jwt.sign(info, this.TOKEN_SECRET, {
+            let token = this.jwt.sign(info, this.TOKEN_SECRET, {
               expiresIn: this.EXPIRES_IN
             });
 
@@ -48,8 +46,8 @@ export default class IdentityService extends BaseService {
   }
 
   generatePassword = async (password: string) => {
-    await bcrypt.genSalt(10).then((result) => (this.SALT = result));
-    return await bcrypt.hash(password, this.SALT);
+    await this.bcrypt.genSalt(10).then((result: any) => (this.SALT = result));
+    return await this.bcrypt.hash(password, this.SALT);
   };
 
   ChangePassword = async (user: any, password: string, newPassword: string) => {
@@ -57,7 +55,7 @@ export default class IdentityService extends BaseService {
     if (!validUser) {
       return false;
     } else {
-      const validPass = await bcrypt.compare(
+      const validPass = await this.bcrypt.compare(
         password,
         validUser.password
       );

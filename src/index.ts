@@ -11,6 +11,7 @@ import { EntityConfig } from "./types/entity-config";
 import { Application } from "express";
 import { UserController } from "./controllers/identity.controller";
 import { IPatchOperation } from "./base/service.interface";
+
 let app: any;
 
 export class SpryJs {

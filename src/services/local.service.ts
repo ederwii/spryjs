@@ -1,5 +1,7 @@
 import UserService from "./identity.service";
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 export class service {
   private TOKEN_SECRET = '';
@@ -18,7 +20,7 @@ export class service {
     );
 
     var model = mongoose.model("User", UserSchema);
-    this.USER_SERVICE = new UserService(this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN, model);
+    this.USER_SERVICE = new UserService(bcrypt, jwt, this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN, model);
   }
 
   createUser(user: any): Promise<void> {
