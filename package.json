@@ -29,7 +29,7 @@
     "rapid"
   ],
   "author": "Alan Martinez",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/cors": "^2.8.10",
