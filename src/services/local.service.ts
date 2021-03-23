@@ -14,6 +14,9 @@ export class service {
   private USER_MODEL: any = undefined;
 
   initializeIdentityService() {
+    if (!this.TOKEN_SECRET || this.SALT)
+      throw new Error('Invalid Identity Service configuration');
+    
     const UserSchema: Schema = new Schema(
       this.USER_MODEL,
       { timestamps: true }
@@ -21,18 +24,6 @@ export class service {
 
     var model = mongoose.model("User", UserSchema);
     this.IDENTITY_SERVICE = new IdentityService(bcrypt, jwt, this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN, model);
-  }
-
-  createUser(user: any): Promise<void> {
-    return new Promise((res, rej) => {
-      this.IDENTITY_SERVICE && this.IDENTITY_SERVICE.Create(user).then(() => res())
-    })
-  }
-
-  authenticate(username: string, password: string): Promise<string> {
-    return new Promise((res, rej) => {
-      this.IDENTITY_SERVICE && this.IDENTITY_SERVICE.DoLogin(username, password).then((r) => res(r)).catch((err) => rej(err));
-    })
   }
 
   get userModel() {
