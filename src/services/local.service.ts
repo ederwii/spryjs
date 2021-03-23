@@ -12,11 +12,12 @@ export class service {
   private IDENTITY_SERVICE: IdentityService | undefined;
   private EXPIRES_IN = 0;
   private USER_MODEL: any = undefined;
+  private MAPPED_FIELDS: Map<string, any> = new Map<string, any>();
 
   initializeIdentityService() {
     if (!this.TOKEN_SECRET || !this.SALT)
       throw new Error('Invalid Identity Service configuration');
-    
+
     const UserSchema: Schema = new Schema(
       this.USER_MODEL,
       { timestamps: true }
@@ -24,6 +25,14 @@ export class service {
 
     var model = mongoose.model("User", UserSchema);
     this.IDENTITY_SERVICE = new IdentityService(bcrypt, jwt, this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN, model);
+  }
+
+  get mappedFields() {
+    return this.MAPPED_FIELDS;
+  }
+
+  set mappedFields(val) {
+    this.MAPPED_FIELDS = val;
   }
 
   get userModel() {
@@ -74,6 +83,9 @@ export class service {
     this.ENTITIES.push(entity);
   }
 
+  mapField(field: string, targetField: string = field, required: boolean = false) {
+    this.mappedFields.set(field, { targetField, required });
+  }
   get mongoCs() {
     return this.MONGO_CS;
   }

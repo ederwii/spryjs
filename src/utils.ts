@@ -61,6 +61,6 @@ export const tokenCheckMap = (req: Request) => {
       token ? token.toString() : "",
       TOKEN_SECRET
     );
-    req.body["userId"] = verified._id;
+    req.body._user = verified;
   }
 }

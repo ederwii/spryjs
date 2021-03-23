@@ -1,11 +1,12 @@
 import IService, { IPatchOperation } from "./service.interface";
 import mongoose from "mongoose";
+import LocalService from "../services/local.service";
 
 export default class BaseService implements IService {
   public _entity: any;
   public keywordField: string;
   public entityName: string;
-  
+  private mappedFields: Map<string, any>;
   constructor(
     __entity: mongoose.Model<any>,
     entityName: string,
@@ -14,6 +15,7 @@ export default class BaseService implements IService {
     this._entity = __entity;
     this.keywordField = keywordField;
     this.entityName = entityName;
+    this.mappedFields = LocalService.getInstance().mappedFields;
   }
 
   async Get(): Promise<any[]> {
@@ -52,7 +54,21 @@ export default class BaseService implements IService {
 
   async Create(payload: Partial<any>): Promise<any> {
     return new Promise<any>(async (resolve, reject) => {
-      const data: any = { ...payload };
+      let data: any = { ...payload };
+      const user = payload._user;
+      let keys = this.mappedFields.keys();
+      for (let i = 0; i < this.mappedFields.size; i++) {
+        const key = keys.next().value;
+        const v = this.mappedFields.get(key);
+        let fieldFromUser = '';
+        if (payload.user) {
+          fieldFromUser = payload.user[key];
+        }
+        if ('required' in v && v.required && fieldFromUser.length < 1) {
+          throw new Error(`Required mapped field ${key} not found in token`)
+        }
+        data[v.targetField] = fieldFromUser;
+      }
       const newRecord = new this._entity(data);
       try {
         const created = await newRecord.save();
@@ -99,4 +115,6 @@ export default class BaseService implements IService {
     })
     return await this._entity.updateOne({ _id: id }, { $set: diff }).exec();
   }
+
+
 }

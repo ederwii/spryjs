@@ -6,7 +6,7 @@ import IdentityService from "../services/identity.service";
 export class UserController extends BaseController {
   constructor(private app: Application, private identityService: IdentityService, private route = "/api/user") {
     // @ts-ignore
-    super(app, BASE_API, identityService, {
+    super(app, route, identityService, {
       auth: {
         getById: true,
         post: false,

@@ -59,6 +59,11 @@ export class SpryJs {
       lservice.getInstance().initializeIdentityService();
 
       let service = lservice.getInstance().identityService;
+      if (c.route && c.route[0] === '/') {
+        c.route = `/api${c.route}`;
+      } else {
+        c.route = `/api/${c.route}`;
+      }
       service && new UserController(app.app, service, c.route);
 
       console.log(`Authentication enabled. Endpoint created: ${c.route}`);
@@ -138,6 +143,24 @@ export class SpryJs {
   /** Create new model for MongoDB */
   createModel(name: string, schema: Schema): mongoose.Model<any, {}> {
     return mongoose.model(name, schema);
+  }
+
+  /**
+   * Maps an user property to a specific entity. Mapped propertis will be filled automatically
+   * when creating a new record of the entity
+   * @param {string} property User property to be mapped
+   * @param {string} entity Entity to be mapped with
+   */
+  mapUserProperty(property: string, entity: string, targetProperty: string = property, required: boolean = false) {
+    // Check if entity is registered
+    const existing = lservice.getInstance().entities.find(x => x.name.toLowerCase() == entity.toLowerCase());
+    if (!existing)
+      throw new Error(`Entity ${entity} is not registered`);
+    
+    lservice.getInstance().mapField(property, targetProperty, required);
+    lservice.getInstance().identityService?.MapUserField(property);
+
+    
   }
 
   private addEntity(entity: any): void {

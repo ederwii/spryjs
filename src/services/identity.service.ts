@@ -5,6 +5,12 @@ export default class IdentityService extends BaseService {
     super(USER, "User", 'username');
   }
 
+  private userMappedFields: string[] = [];
+
+  MapUserField(field: string) {
+    this.userMappedFields.push(field);
+  }
+
   async Create(payload: any): Promise<any> {
     const existingUser = await this.USER.findOne({ username: payload.username });
     if (!existingUser) {
@@ -29,10 +35,12 @@ export default class IdentityService extends BaseService {
             let info: any = {
               id: validUser._id
             };
+            this.userMappedFields.forEach(mf => {
+              validUser[mf] && (info[mf] = validUser[mf])
+            })
             let token = this.jwt.sign(info, this.TOKEN_SECRET, {
               expiresIn: this.EXPIRES_IN
             });
-
             let response: any;
             response = {
               token
