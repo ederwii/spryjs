@@ -5,12 +5,13 @@ import FactoryService from "./services/factory.service";
 import BaseService from "./base/base.service";
 import IService from "./base/service.interface";
 import mongoose, { Schema } from "mongoose";
-import { DEFAULT_MORGAN_FORMAT } from "./constants"
+import { DEFAULT_MORGAN_FORMAT, DEFAULT_AUTH_CONFIG } from "./constants"
 import { SpryConfig } from "./types/spry-config";
 import { EntityConfig } from "./types/entity-config";
 import { Application } from "express";
 import { UserController } from "./controllers/identity.controller";
 import { IPatchOperation } from "./base/service.interface";
+import { AuthConfig } from "./types/auth-config"
 
 let app: any;
 
@@ -33,18 +34,28 @@ export class SpryJs {
 
   /**
    * Enable JWT authentication.
-   * @param {string} token_secret - String to be used for token security 
-   * @param {string} salt - String to be used for user password encryption
-   * @param {number} expiresIn - In seconds: Time for token to expire. Defaults to 24 hours 
-   * @param {any} model - user model to be used. Must include username and password
+   * @param {Partial<AuthConfig>} config - Partial config to be used
+   * @param {string} config.tokenSecret - String to be used for token security 
+   * @param {string} config.salt - String to be used for user password encryption
+   * @param {number} config.expiresIn - In seconds: Time for token to expire. Defaults to 24 hours
+   * @param {any} config.model - user model to be used. Must include username and password
    * @returns {Promise} Void promise
    */
-  useAuthentication(token_secret: string, salt: string, model: any = { username: String, password: String }, expiresIn: number = 86400): Promise<void> {
+  useAuthentication(config: Partial<AuthConfig>): Promise<void> {
     return new Promise((res, rej) => {
-      lservice.getInstance().tokenSecret = token_secret;
-      lservice.getInstance().salt = salt;
-      lservice.getInstance().expiresIn = expiresIn;
-      lservice.getInstance().userModel = model;
+      let c = { ...DEFAULT_AUTH_CONFIG };
+      Object.assign(c, config);
+      console.log(c);
+      if ((c.tokenSecret && c.tokenSecret.length < 1) || (c.salt && c.salt.length < 1)) {
+        throw new Error('Invalid authentication configuration')
+      }
+      if (c.tokenSecret)
+        lservice.getInstance().tokenSecret = c.tokenSecret;
+      if (c.salt)
+        lservice.getInstance().salt = c.salt;
+      if (c.expiresIn)
+      lservice.getInstance().expiresIn = c.expiresIn;
+      lservice.getInstance().userModel = c.model;
       lservice.getInstance().initializeIdentityService();
 
       var fixedPath = `/api/user`;
@@ -144,7 +155,8 @@ export {
   EntityConfig,
   BaseService,
   IService,
-  IPatchOperation
+  IPatchOperation,
+  AuthConfig
 }
 
 class Singleton {

@@ -14,7 +14,7 @@ export class service {
   private USER_MODEL: any = undefined;
 
   initializeIdentityService() {
-    if (!this.TOKEN_SECRET || this.SALT)
+    if (!this.TOKEN_SECRET || !this.SALT)
       throw new Error('Invalid Identity Service configuration');
     
     const UserSchema: Schema = new Schema(
