@@ -45,11 +45,11 @@ export class SpryJs {
       lservice.getInstance().salt = salt;
       lservice.getInstance().expiresIn = expiresIn;
       lservice.getInstance().userModel = model;
-      lservice.getInstance().initializeUserService();
+      lservice.getInstance().initializeIdentityService();
 
       var fixedPath = `/api/user`;
 
-      let service = lservice.getInstance().userService;
+      let service = lservice.getInstance().identityService;
       service && new UserController(app.app, service);
 
       console.log(`Authentication enabled. Endpoint created: ${fixedPath}`);

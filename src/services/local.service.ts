@@ -1,4 +1,4 @@
-import UserService from "./identity.service";
+import IdentityService from "./identity.service";
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -9,29 +9,29 @@ export class service {
   private MONGO_CS = '';
   private ENTITIES: any[] = [];
   private USE_TIMESTAMPS: boolean = true;
-  private USER_SERVICE: UserService | undefined;
+  private IDENTITY_SERVICE: IdentityService | undefined;
   private EXPIRES_IN = 0;
   private USER_MODEL: any = undefined;
 
-  initializeUserService() {
+  initializeIdentityService() {
     const UserSchema: Schema = new Schema(
       this.USER_MODEL,
       { timestamps: true }
     );
 
     var model = mongoose.model("User", UserSchema);
-    this.USER_SERVICE = new UserService(bcrypt, jwt, this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN, model);
+    this.IDENTITY_SERVICE = new IdentityService(bcrypt, jwt, this.TOKEN_SECRET, this.SALT, this.EXPIRES_IN, model);
   }
 
   createUser(user: any): Promise<void> {
     return new Promise((res, rej) => {
-      this.USER_SERVICE && this.USER_SERVICE.Create(user).then(() => res())
+      this.IDENTITY_SERVICE && this.IDENTITY_SERVICE.Create(user).then(() => res())
     })
   }
 
   authenticate(username: string, password: string): Promise<string> {
     return new Promise((res, rej) => {
-      this.USER_SERVICE && this.USER_SERVICE.DoLogin(username, password).then((r) => res(r)).catch((err) => rej(err));
+      this.IDENTITY_SERVICE && this.IDENTITY_SERVICE.DoLogin(username, password).then((r) => res(r)).catch((err) => rej(err));
     })
   }
 
@@ -49,12 +49,12 @@ export class service {
     this.EXPIRES_IN = val;
   }
 
-  get userService() {
-    return this.USER_SERVICE
+  get identityService() {
+    return this.IDENTITY_SERVICE
   }
 
   get canIdentityBeConfigured() {
-    return this.TOKEN_SECRET.length && this.SALT && this.USER_SERVICE == undefined;
+    return this.TOKEN_SECRET.length && this.SALT && this.IDENTITY_SERVICE == undefined;
   }
 
   get salt() {
