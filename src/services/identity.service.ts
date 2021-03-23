@@ -8,7 +8,7 @@ export default class IdentityService extends BaseService {
   async Create(payload: any): Promise<any> {
     const existingUser = await this.USER.findOne({ username: payload.username });
     if (!existingUser) {
-      payload.password = await this.generatePassword(payload.password);
+      payload.password = await this.GeneratePassword(payload.password);
       return await super.Create(payload);
     } else throw new TypeError("User already registered");
   }
@@ -45,7 +45,7 @@ export default class IdentityService extends BaseService {
     })
   }
 
-  generatePassword = async (password: string) => {
+  GeneratePassword = async (password: string) => {
     await this.bcrypt.genSalt(10).then((result: any) => (this.SALT = result));
     return await this.bcrypt.hash(password, this.SALT);
   };
@@ -62,7 +62,7 @@ export default class IdentityService extends BaseService {
       if (!validPass) {
         false;
       } else {
-        validUser.password = await this.generatePassword(newPassword);
+        validUser.password = await this.GeneratePassword(newPassword);
         validUser.save().then((result: any) => {
           if (result) {
             return true;
