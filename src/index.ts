@@ -45,25 +45,23 @@ export class SpryJs {
     return new Promise((res, rej) => {
       let c = { ...DEFAULT_AUTH_CONFIG };
       Object.assign(c, config);
-      console.log(c);
+
       if ((c.tokenSecret && c.tokenSecret.length < 1) || (c.salt && c.salt.length < 1)) {
         throw new Error('Invalid authentication configuration')
       }
-      if (c.tokenSecret)
-        lservice.getInstance().tokenSecret = c.tokenSecret;
-      if (c.salt)
-        lservice.getInstance().salt = c.salt;
-      if (c.expiresIn)
-      lservice.getInstance().expiresIn = c.expiresIn;
+      c.tokenSecret &&
+        (lservice.getInstance().tokenSecret = c.tokenSecret);
+      c.salt &&
+        (lservice.getInstance().salt = c.salt);
+      c.expiresIn &&
+        (lservice.getInstance().expiresIn = c.expiresIn);
       lservice.getInstance().userModel = c.model;
       lservice.getInstance().initializeIdentityService();
 
-      var fixedPath = `/api/user`;
-
       let service = lservice.getInstance().identityService;
-      service && new UserController(app.app, service);
+      service && new UserController(app.app, service, c.route);
 
-      console.log(`Authentication enabled. Endpoint created: ${fixedPath}`);
+      console.log(`Authentication enabled. Endpoint created: ${c.route}`);
       res();
     })
   }

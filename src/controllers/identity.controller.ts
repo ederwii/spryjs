@@ -3,10 +3,8 @@ import BaseController from "../base/base.controller";
 import { DoRequest, DoPrivateRequest } from "../utils";
 import IdentityService from "../services/identity.service";
 
-const BASE_API = "/api/user";
-
 export class UserController extends BaseController {
-  constructor(private app: Application, private identityService: IdentityService) {
+  constructor(private app: Application, private identityService: IdentityService, private route = "/api/user") {
     // @ts-ignore
     super(app, BASE_API, identityService, {
       auth: {
@@ -22,7 +20,7 @@ export class UserController extends BaseController {
 
   registerPrivateRoutes() {
     this.app
-      .route(`${BASE_API}/login`)
+      .route(`${this.route}/login`)
       .post(DoRequest, async (req, res) => {
         this.identityService.DoLogin(req.body.username, req.body.password).then((token) => {
           res.json({ token });
@@ -33,7 +31,7 @@ export class UserController extends BaseController {
       });
 
     this.app
-      .route(`${BASE_API}/password`)
+      .route(`${this.route}/password`)
       .put(DoPrivateRequest, async (req, res) => {
         // @ts-ignore
         const result = await this.identityService.ChangePassword(req.body.user, req.body.password, req.body.newPassword);
