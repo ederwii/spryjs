@@ -55,7 +55,11 @@ export class SpryJs {
         (lservice.getInstance().salt = c.salt);
       c.expiresIn &&
         (lservice.getInstance().expiresIn = c.expiresIn);
-      lservice.getInstance().userModel = c.model;
+      lservice.getInstance().userModel = {
+        roles: [String],
+        isLocked: Boolean,
+        failedAttempts: Number,
+        lastSignIn: Date, ...c.model };
       lservice.getInstance().initializeIdentityService();
 
       let service = lservice.getInstance().identityService;

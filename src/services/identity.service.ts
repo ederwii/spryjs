@@ -30,10 +30,18 @@ export default class IdentityService extends BaseService {
             validUser.password
           );
           if (!validPass) {
+            validUser.failedAttempts++;
+            if (validUser.failedAttempts == 5) {
+              validUser.isLocked = true;
+            }
+            validUser.save();
+            rej();
+          } else if (validUser.isLocked) {
             rej();
           } else {
             let info: any = {
-              id: validUser._id
+              id: validUser._id,
+              roles: validUser.roles
             };
             this.userMappedFields.forEach(mf => {
               validUser[mf] && (info[mf] = validUser[mf])
@@ -41,6 +49,9 @@ export default class IdentityService extends BaseService {
             let token = this.jwt.sign(info, this.TOKEN_SECRET, {
               expiresIn: this.EXPIRES_IN
             });
+            validUser.failedAttempts = 0;
+            validUser.lastSignIn = new Date();
+            validUser.save();
             let response: any;
             response = {
               token

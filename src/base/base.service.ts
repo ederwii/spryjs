@@ -55,19 +55,22 @@ export default class BaseService implements IService {
   async Create(payload: Partial<any>): Promise<any> {
     return new Promise<any>(async (resolve, reject) => {
       let data: any = { ...payload };
-      const user = payload._user;
+      const user = payload.user;
       let keys = this.mappedFields.keys();
       for (let i = 0; i < this.mappedFields.size; i++) {
         const key = keys.next().value;
         const v = this.mappedFields.get(key);
-        let fieldFromUser = '';
-        if (payload.user) {
-          fieldFromUser = payload.user[key];
+        if (v.targetField && v.targetField in data) {
+          let fieldFromUser = '';
+          if (user && key in user) {
+            fieldFromUser = user[key];
+          }
+          if ('required' in v && v.required && fieldFromUser.length < 1) {
+            throw new Error(`Required mapped field ${key} not found in token`)
+          }
+          data[v.targetField] = fieldFromUser;
         }
-        if ('required' in v && v.required && fieldFromUser.length < 1) {
-          throw new Error(`Required mapped field ${key} not found in token`)
-        }
-        data[v.targetField] = fieldFromUser;
+
       }
       const newRecord = new this._entity(data);
       try {
