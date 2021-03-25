@@ -1,30 +1,41 @@
 import IService from "./service.interface";
 import { Application } from "express";
 import { DoRequest, DoPrivateRequest, tokenCheckMap } from "../utils";
-import localService from "../services/local.service"
 import { SpryConfig } from "../types/spry-config";
-
-const service = localService.getInstance();
-
-const TOKEN_SECRET = service.tokenSecret;
 
 export default abstract class BaseController {
 
   private readonly _config: SpryConfig = {
-    auth: {
-      get: false,
-      getById: false,
-      post: false,
-      delete: false,
-      put: false,
-      patch: false
+    get: {
+      isPrivate: false,
+      isDisabled: false,
+      permissions: []
     },
-    noGet: false,
-    noDelete: false,
-    noGetById: false,
-    noPost: false,
-    noPut: false,
-    noPatch: false
+    getById: {
+      isPrivate: false,
+      isDisabled: false,
+      permissions: []
+    },
+    post: {
+      isPrivate: false,
+      isDisabled: false,
+      permissions: []
+    },
+    delete: {
+      isPrivate: false,
+      isDisabled: false,
+      permissions: []
+    },
+    put: {
+      isPrivate: false,
+      isDisabled: false,
+      permissions: []
+    },
+    patch: {
+      isPrivate: false,
+      isDisabled: false,
+      permissions: []
+    },
   }
 
   constructor(
@@ -41,10 +52,10 @@ export default abstract class BaseController {
   public registerRoutes() {
     console.log('Register path ' + this.baseApi);
 
-    !this._config.noGet && this._app
+    !this._config.get?.isDisabled && this._app
       .route(this.baseApi.toLowerCase())
       .get(
-        this._config.auth.get ? DoPrivateRequest : DoRequest,
+        this._config.get?.isPrivate ? DoPrivateRequest : DoRequest,
         async (req, res) => {
 
           const sortBy = req.query.sortBy
@@ -111,10 +122,10 @@ export default abstract class BaseController {
         }
       );
 
-    !this._config.noPost && this._app
+    !this._config.post?.isDisabled && this._app
       .route(this.baseApi.toLowerCase())
       .post(
-        this._config.auth.post ? DoPrivateRequest : DoRequest,
+        this._config.post?.isPrivate ? DoPrivateRequest : DoRequest,
         async (req, res) => {
           try {
             tokenCheckMap(req);
@@ -130,10 +141,10 @@ export default abstract class BaseController {
         }
       );
 
-    !this._config.noGetById && this._app
+    !this._config.getById?.isDisabled && this._app
       .route(`${this.baseApi.toLowerCase()}/:id`)
       .get(
-        this._config.auth.getById ? DoPrivateRequest : DoRequest,
+        this._config.getById?.isPrivate ? DoPrivateRequest : DoRequest,
         async (req, res) => {
           const id = req.params.id;
           await this.service
@@ -149,10 +160,10 @@ export default abstract class BaseController {
         }
       )
 
-    !this._config.noDelete && this._app
+    !this._config.delete?.isDisabled && this._app
       .route(`${this.baseApi.toLowerCase()}/:id`)
       .delete(
-        this._config.auth.delete ? DoPrivateRequest : DoRequest,
+        this._config.delete?.isPrivate ? DoPrivateRequest : DoRequest,
         async (req, res) => {
           const id = req.params.id;
           await this.service.Delete(id).then(
@@ -167,10 +178,10 @@ export default abstract class BaseController {
         }
       )
 
-    !this._config.noPut && this._app
+    !this._config.put?.isDisabled && this._app
       .route(`${this.baseApi.toLowerCase()}/:id`)
       .put(
-        this._config.auth.put ? DoPrivateRequest : DoRequest,
+        this._config.put?.isPrivate ? DoPrivateRequest : DoRequest,
         async (req, res) => {
           tokenCheckMap(req);
           this.service
@@ -184,10 +195,10 @@ export default abstract class BaseController {
         }
     );
     
-    !this._config.noPatch && this._app
+    !this._config.patch?.isDisabled && this._app
       .route(`${this.baseApi.toLowerCase()}/:id`)
       .patch(
-        this._config.auth.put ? DoPrivateRequest : DoRequest,
+        this._config.patch?.isPrivate ? DoPrivateRequest : DoRequest,
         async (req, res) => {
           tokenCheckMap(req);
           this.service

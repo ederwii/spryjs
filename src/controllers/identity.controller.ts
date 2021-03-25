@@ -7,12 +7,15 @@ export class UserController extends BaseController {
   constructor(private app: Application, private identityService: IdentityService, private route = "/api/user") {
     // @ts-ignore
     super(app, route, identityService, {
-      auth: {
-        getById: true,
-        post: false,
-        delete: true,
-        put: true,
+      getById: {
+        isPrivate: true
       },
+      delete: {
+        isPrivate: true
+      },
+      put: {
+        isPrivate: true
+      }
     });
     this.registerPrivateRoutes();
     this.registerRoutes();

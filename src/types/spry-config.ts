@@ -1,18 +1,14 @@
 export type SpryConfig = {
-  auth: SpryConfigAuth;
-  noGet?: boolean;
-  noGetById?: boolean;
-  noPost?: boolean;
-  noDelete?: boolean;
-  noPut?: boolean;
-  noPatch?: boolean
+  get?: Partial<VerbConfig>,
+  getById?: Partial<VerbConfig>,
+  post?: Partial<VerbConfig>,
+  delete?: Partial<VerbConfig>,
+  put?: Partial<VerbConfig>,
+  patch?: Partial<VerbConfig>
 }
 
-export type SpryConfigAuth = {
-  get?: boolean,
-  getById?: boolean,
-  post?: boolean,
-  delete?: boolean,
-  put?: boolean,
-  patch?: boolean
+export type VerbConfig = {
+  isPrivate: boolean,
+  isDisabled: boolean,
+  permissions?: string[]
 }
