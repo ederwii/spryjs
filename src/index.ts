@@ -123,11 +123,8 @@ export class SpryJs {
       const controller = new FactoryController(app.app, fixedPath, config.service, config.config, config.routes);
 
       this.addEntity({
-        name: config.name,
-        path: config.path,
-        service: config.service,
         controller,
-        config: config.config,
+        config: config,
         dbmodel: m
       })
 
@@ -157,7 +154,7 @@ export class SpryJs {
    */
   mapUserProperty(property: string, entity: string, targetProperty: string = property, required: boolean = false) {
     // Check if entity is registered
-    const existing = lservice.getInstance().entities.find(x => x.name.toLowerCase() == entity.toLowerCase());
+    const existing = lservice.getInstance().entities.find(x => x.config && x.config.name && x.config.name.toLowerCase() == entity.toLowerCase());
     if (!existing)
       throw new Error(`Entity ${entity} is not registered`);
     
