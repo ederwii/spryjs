@@ -68,7 +68,7 @@ export class SpryJs {
       } else {
         c.route = `/api/${c.route}`;
       }
-      service && new UserController(app.app, service, c.route);
+      service && c.enableRoutes && new UserController(app.app, service, c.route);
 
       console.log(`Authentication enabled. Endpoint created: ${c.route}`);
       res();

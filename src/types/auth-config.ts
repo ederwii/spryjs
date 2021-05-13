@@ -3,5 +3,6 @@ export type AuthConfig = {
   salt: string,
   model: any,
   expiresIn: number,
-  route: string
+  route: string,
+  enableRoutes: boolean
 }
